@@ -108,7 +108,7 @@ public class MovieListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 NavHostFragment.findNavController(MovieListFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
+                        .navigate(R.id.action_movieListFragment_to_detailMovieFragment);
             }
         });
 
@@ -120,11 +120,25 @@ public class MovieListFragment extends Fragment {
         binding.rvMovieList.setAdapter(movieRecyclerAdapter);
     }
 
-    private void onMovieListener(int position) {
+    private void onMovieListener(View view) {
+        if(view != null){
+            Log.d(TAG, "onMovieListener: tedMovieTitle:: "
+                    + movieList.get(binding.rvMovieList
+                    .getChildAdapterPosition(view)).getMovieTitle());
+            Movie movieSelected = movieList.get(binding.rvMovieList.getChildAdapterPosition(view));
+            MovieListFragmentDirections
+                    .ActionMovieListFragmentToDetailMovieFragment action
+                    = MovieListFragmentDirections.actionMovieListFragmentToDetailMovieFragment(movieSelected);
+            NavHostFragment.findNavController(MovieListFragment.this)
+                    .navigate(action);
+        }
+    }
+
+/*    private void onMovieListener(int position) {
         if(movieList != null && movieList.get(position) != null){
             Log.d(TAG, "onMovieListener: selectedMovieTitle:: " + movieList.get(position).getMovieTitle());
         }
-    }
+    }*/
 
     @Override
     public void onDestroyView() {

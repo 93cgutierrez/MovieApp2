@@ -84,11 +84,12 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         @Override
         public void onClick(View view) {
             //onMovieListener.onMovieListener(getAdapterPosition());
-            onMovieListener.onMovieListener(getLayoutPosition());
+            //onMovieListener.onMovieListener(getLayoutPosition());
+            onMovieListener.onMovieListener(view);
         }
     }
 
     public interface OnMovieListener{
-        void onMovieListener(int position);
+        void onMovieListener(View view);
     }
 }

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
@@ -112,9 +113,9 @@ public class MovieListFragment extends Fragment {
         });
 
         binding.rvMovieList.setHasFixedSize(true);
-        binding.rvMovieList.setLayoutManager(
-                new LinearLayoutManager(getContext(),
-                        LinearLayoutManager.VERTICAL, false));
+        binding.rvMovieList.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+               /* new LinearLayoutManager(getContext(),
+                        LinearLayoutManager.VERTICAL, false));*/
         movieRecyclerAdapter = new MovieRecyclerAdapter(movieList, getContext(), this::onMovieListener);
         binding.rvMovieList.setAdapter(movieRecyclerAdapter);
     }

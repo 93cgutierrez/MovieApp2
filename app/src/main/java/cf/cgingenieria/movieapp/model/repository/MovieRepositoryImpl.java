@@ -1,0 +1,24 @@
+package cf.cgingenieria.movieapp.model.repository;
+
+
+import cf.cgingenieria.movieapp.io.MovieApiAdapter;
+import cf.cgingenieria.movieapp.model.data.response.MovieDetailsResponse;
+import cf.cgingenieria.movieapp.model.data.response.MovieListResponse;
+import io.reactivex.Observable;
+import retrofit2.Response;
+
+/**
+ * Created by CGIngenieria on 11/02/2021.
+ */
+public class MovieRepositoryImpl implements MovieRepository{
+
+    @Override
+    public Observable<Response<MovieListResponse>> getMovieList() {
+        return MovieApiAdapter.getApiService().getMovieList();
+    }
+
+    @Override
+    public Observable<Response<MovieDetailsResponse>> getMovieDetail(int movieId) {
+        return MovieApiAdapter.getApiService().getMovieDetail(movieId);
+    }
+}

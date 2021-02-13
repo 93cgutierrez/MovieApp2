@@ -26,6 +26,11 @@ public class Movie implements Parcelable {
     @SerializedName("poster_path")
     @Expose
     String moviePosterPath;
+    @SerializedName("release_date")
+    @Expose
+    String movieReleaseDate;
+                        //"2020-12-16",
+
 
     public Integer getMovieId() {
         return MovieId;
@@ -67,12 +72,21 @@ public class Movie implements Parcelable {
         this.moviePosterPath = moviePosterPath;
     }
 
+    public String getMovieReleaseDate() {
+        return movieReleaseDate;
+    }
+
+    public void setMovieReleaseDate(String movieReleaseDate) {
+        this.movieReleaseDate = movieReleaseDate;
+    }
+
     protected Movie(Parcel in) {
         MovieId = in.readByte() == 0x00 ? null : in.readInt();
         movieTitle = in.readString();
         movieOverview = in.readString();
         movieBackdropPath = in.readString();
         moviePosterPath = in.readString();
+        movieReleaseDate = in.readString();
     }
 
     @Override
@@ -92,6 +106,7 @@ public class Movie implements Parcelable {
         dest.writeString(movieOverview);
         dest.writeString(movieBackdropPath);
         dest.writeString(moviePosterPath);
+        dest.writeString(movieReleaseDate);
     }
 
     @SuppressWarnings("unused")

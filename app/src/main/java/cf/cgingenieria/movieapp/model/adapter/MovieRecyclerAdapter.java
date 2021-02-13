@@ -74,6 +74,7 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
             //GLIDE set image
             try{
                 Glide.with(context).load(Parameters.API_SERVER_BASE_URL_POSTER + movie.getMoviePosterPath())
+                        .centerInside()
                         .into(iv_movie_poster);
             } catch (Exception e){
                 Glide.with(context).load(R.drawable.ic_launcher_foreground)

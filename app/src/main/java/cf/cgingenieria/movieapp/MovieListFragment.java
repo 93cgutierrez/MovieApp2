@@ -30,6 +30,7 @@ public class MovieListFragment extends Fragment {
     private List<Movie> movieList = new ArrayList<Movie>();
     private MovieRecyclerAdapter movieRecyclerAdapter;
 
+
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,

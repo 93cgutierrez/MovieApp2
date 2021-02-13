@@ -5,4 +5,8 @@
     <string name="previous">Previous</string>
     <string name="fragment_movie_list_title">Movies</string>
     <string name="fragment_detail_movie_title">Detail movie</string>
+    <string name="fab_refresh_list_movie_content">Refresh list</string>
+    <string name="icon_content">Icon</string>
+    <string name="msg_error">An error has occurred: </string>
+    <string name="msg_empty">The list is empty</string>
 </resources>

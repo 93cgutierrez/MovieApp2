@@ -1,5 +1,7 @@
 package cf.cgingenieria.movieapp.viewmodel;
 
+import android.os.Handler;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -66,12 +68,12 @@ public class MovieListViewModel extends ViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 result -> {
-                                    isViewLoading.postValue(false);
-                                    if (result.code() == 200 && result.body() != null && result.body().getProductList() != null && result.body().getProductList().size() > 0) {
-                                        movieList.postValue(result.body().getProductList());
-                                    } else {
-                                        isEmptyMovieList.postValue(true);
-                                    }
+                                        isViewLoading.postValue(false);
+                                        if (result.code() == 200 && result.body() != null && result.body().getProductList() != null && result.body().getProductList().size() > 0) {
+                                            movieList.postValue(result.body().getProductList());
+                                        } else {
+                                            isEmptyMovieList.postValue(true);
+                                        }
                                 },
                                 throwable -> {
                                     isViewLoading.postValue(false);

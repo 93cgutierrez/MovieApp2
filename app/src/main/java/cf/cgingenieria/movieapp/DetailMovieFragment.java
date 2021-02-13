@@ -6,20 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 
 import cf.cgingenieria.movieapp.databinding.FragmentDetailMovieBinding;
-import cf.cgingenieria.movieapp.databinding.FragmentMovieListBinding;
 import cf.cgingenieria.movieapp.model.data.response.Movie;
 import cf.cgingenieria.movieapp.utils.Parameters;
 import cf.cgingenieria.movieapp.utils.UIHelper;
-import cf.cgingenieria.movieapp.viewmodel.MovieListViewModel;
 
 public class DetailMovieFragment extends Fragment {
     private static final String TAG = DetailMovieFragment.class.getCanonicalName();
@@ -68,10 +66,11 @@ public class DetailMovieFragment extends Fragment {
         setImage(viewContext, Parameters.API_SERVER_BASE_URL_POSTER + movieReceived.getMovieBackdropPath(), binding.ivMoviePosterDetail);
         binding.tvMovieOverview.setText(movieReceived.getMovieOverview());
         binding.tvMovieReleaseDate.setText(movieReceived.getMovieReleaseDate());
- /*       NavHostFragment.findNavController(DetailMovieFragment.this)
-                .popBackStack();
-                NavHostFragment.findNavController(DetailMovieFragment.this)
-                        .navigate(R.id.action_detailMovieFragment_to_movieListFragment);*/
+        binding.fabMovieTrailer.setOnClickListener(view -> {
+            Toast.makeText(getContext(),
+                    R.string.msg_trailer_not_available,
+                    Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void setImage(View viewContext, String url, ImageView imageView) {

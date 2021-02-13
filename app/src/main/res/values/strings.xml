@@ -5,4 +5,5 @@
     <string name="previous">Previous</string>
     <string name="fragment_movie_list_title">Movies</string>
     <string name="fragment_detail_movie_title">Detail movie</string>
+    <string name="msg_trailer_not_available">trailer not available</string>
 </resources>

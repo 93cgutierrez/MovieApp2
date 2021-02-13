@@ -68,15 +68,12 @@ public class MovieListViewModel extends ViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 result -> {
-                                    new Handler().postDelayed(() -> {
                                         isViewLoading.postValue(false);
                                         if (result.code() == 200 && result.body() != null && result.body().getProductList() != null && result.body().getProductList().size() > 0) {
                                             movieList.postValue(result.body().getProductList());
                                         } else {
                                             isEmptyMovieList.postValue(true);
                                         }
-                                    },5000);
-
                                 },
                                 throwable -> {
                                     isViewLoading.postValue(false);

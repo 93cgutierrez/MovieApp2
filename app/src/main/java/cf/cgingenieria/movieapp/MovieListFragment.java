@@ -15,8 +15,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.todkars.shimmer.ShimmerRecyclerView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,7 @@ import cf.cgingenieria.movieapp.databinding.FragmentMovieListBinding;
 import cf.cgingenieria.movieapp.model.adapter.MovieRecyclerAdapter;
 import cf.cgingenieria.movieapp.model.data.response.Movie;
 import cf.cgingenieria.movieapp.viewmodel.MovieListViewModel;
+import retrofit2.http.Body;
 
 public class MovieListFragment extends Fragment {
     private static final String TAG = MovieListFragment.class.getCanonicalName();
@@ -57,7 +61,7 @@ public class MovieListFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(MovieListViewModel.class);
         if (viewContext != null) {
             initUI(viewContext);
-            if (MainActivity.isFirstLaunch()){
+            if (MainActivity.isFirstLaunch()) {
                 mViewModel.getMovieListApi();
                 MainActivity.setIsFirstLaunch(false);
             }
@@ -68,6 +72,7 @@ public class MovieListFragment extends Fragment {
 
     private void subscribeEvents(MovieListViewModel mViewModel) {
         mViewModel.isViewLoading().observe(getViewLifecycleOwner(), this::isLoadingObserver);
+        mViewModel.isViewLoadingMoreMovies().observe(getViewLifecycleOwner(), this::isLoadingMoreMoviesObserver);
         mViewModel.getOnMessageError().observe(getViewLifecycleOwner(), this::getOnMessageErrorObserver);
         mViewModel.isEmptyMovieList().observe(getViewLifecycleOwner(), this::isEmptyMovieList);
         mViewModel.getMovieList().observe(getViewLifecycleOwner(), this::getMovieList);
@@ -77,13 +82,16 @@ public class MovieListFragment extends Fragment {
         // borrar la lista antigua
         if (movieList == null)
             movieList = new ArrayList<Movie>();
-        if (movieList.size() > 0)
-            movieList.clear();
+/*        if (movieList.size() > 0)
+            movieList.clear();*/
 
+        int oldSizeMovieList = movieList.size();
         // agregar nueva lista
         movieList.addAll(movies);
-        // notificar al adaptador
-        movieRecyclerAdapter.notifyDataSetChanged();
+/*        // notificar al adaptador
+        movieRecyclerAdapter.notifyDataSetChanged();*/
+        //añaden no borra anteriores
+        movieRecyclerAdapter.notifyItemRangeInserted(oldSizeMovieList, movies.size());
         //se muestra la lista
         binding.rvMovieList.setVisibility(View.VISIBLE);
         //se oculta lo demas
@@ -132,6 +140,14 @@ public class MovieListFragment extends Fragment {
         binding.srlListMovie.setRefreshing(isLoading);
     }
 
+    private void isLoadingMoreMoviesObserver(Boolean isLoading) {
+        if (binding == null)
+            return;
+        //loading more movies
+        binding.cpiLoadingMoreMovies.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        binding.srlListMovie.setRefreshing(isLoading);
+    }
+
     private void initUI(View viewContext) {
         //fab
         binding.fabRefreshListMovie.setOnClickListener(view -> {
@@ -153,6 +169,21 @@ public class MovieListFragment extends Fragment {
                         LinearLayoutManager.VERTICAL, false));*/
         movieRecyclerAdapter = new MovieRecyclerAdapter(movieList, getContext(), this::onMovieListener);
         binding.rvMovieList.setAdapter(movieRecyclerAdapter);
+        //detectar scroll
+        binding.rvMovieList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                Log.d(TAG, "movie onScrolled: ");
+                if(binding.rvMovieList.canScrollVertically(1)) {
+                    Log.d(TAG, "movie onScrolled: " + mViewModel.getCurrentPageVM() + " - " + mViewModel.getTotalAvailablePagesVM());
+                    if(mViewModel.getCurrentPageVM() <= mViewModel.getTotalAvailablePagesVM()){
+                        mViewModel.setCurrentPageVM(mViewModel.getCurrentPageVM() + 1);
+                        mViewModel.getMovieListApi(mViewModel.getCurrentPageVM());
+                    }
+                }
+            }
+        });
 
         //loading
         binding.srvLoading.setLayoutManager(new GridLayoutManager(getActivity(), 3));

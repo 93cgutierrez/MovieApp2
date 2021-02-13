@@ -13,8 +13,8 @@ import retrofit2.Response;
 public class MovieRepositoryImpl implements MovieRepository{
 
     @Override
-    public Observable<Response<MovieListResponse>> getMovieList() {
-        return MovieApiAdapter.getApiService().getMovieList();
+    public Observable<Response<MovieListResponse>> getMovieList(int currentPage) {
+        return MovieApiAdapter.getApiService().getMovieList(currentPage);
     }
 
     @Override

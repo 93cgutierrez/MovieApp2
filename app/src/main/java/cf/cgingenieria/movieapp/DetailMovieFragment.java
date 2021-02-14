@@ -85,10 +85,17 @@ public class DetailMovieFragment extends Fragment {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        MainActivity.setOnBackPress(true);
+    }
+
+
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-        MainActivity.setOnBackPress(true);
     }
 
 

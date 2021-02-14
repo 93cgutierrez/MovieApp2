@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -41,6 +44,8 @@ public class MovieListFragment extends Fragment {
     private GridLayoutManager gridLayoutManager;
     private int previousTotalCount = 0;
     private boolean isEnabledFilter = false;
+    private Menu movieListMenu;
+    private boolean isMovieSelected = false;
 
 
     @Override
@@ -77,12 +82,16 @@ public class MovieListFragment extends Fragment {
     }
 
     private void setMovieListAllMoviesPopularity() {
+        isLoadingObserver(true);
         new Thread(() -> {
             List<Movie> moviesDB = MainActivity.getMovieDatabase().movieDao().getAllMoviesPopularity();
             if (moviesDB.size() > 0) {
                 if (!movieList.isEmpty())
                     movieList.clear();
-                viewContext.post(() -> getMovieList(moviesDB));
+                viewContext.post(() -> {
+                    isLoadingObserver(false);
+                    getMovieList(moviesDB);
+                });
             }
         }).start();
     }
@@ -113,6 +122,10 @@ public class MovieListFragment extends Fragment {
             //añaden no borra anteriores
             movieRecyclerAdapter.notifyItemRangeInserted(oldSizeMovieList, movies.size());
         }
+        showList();
+    }
+
+    private void showList() {
         //se muestra la lista
         binding.rvMovieList.setVisibility(View.VISIBLE);
         //se oculta lo demas
@@ -136,24 +149,31 @@ public class MovieListFragment extends Fragment {
         movieRecyclerAdapter.notifyDataSetChanged();
 
         //se muestra la lista
-        binding.rvMovieList.setVisibility(View.VISIBLE);
-        //se oculta lo demas
-        isLoadingObserver(false);
-        isEmptyMovieList(false);
-        getOnMessageErrorObserver(null);
-        binding.fabRefreshListMovie.setVisibility(View.GONE);
-        binding.srlListMovie.setVisibility(View.VISIBLE);
+        showList();
     }
 
     private void isEmptyMovieList(Boolean isEmpty) {
+        showEmptyMessage(isEmpty);
+        showFABRefresh();
+    }
+
+    private void showEmptyMessage(Boolean isEmpty) {
         if (isEmpty) {
             binding.ivNotification.setImageResource(R.drawable.empty_icon);
             binding.tvNotification.setText(R.string.msg_empty);
-            binding.fabRefreshListMovie.setVisibility(View.VISIBLE);
-            binding.fabRefreshListMovie.setEnabled(true);
             binding.srlListMovie.setVisibility(View.GONE);
         }
         binding.svNotification.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+    }
+
+
+    private void isEmptyMovieListFilter(Boolean isEmpty) {
+        showEmptyMessage(isEmpty);
+    }
+
+    private void showFABRefresh() {
+        binding.fabRefreshListMovie.setVisibility(View.VISIBLE);
+        binding.fabRefreshListMovie.setEnabled(true);
     }
 
     private void getOnMessageErrorObserver(String error) {
@@ -161,8 +181,7 @@ public class MovieListFragment extends Fragment {
             binding.ivNotification.setImageResource(R.drawable.error_icon);
             binding.tvNotification.setText(String.format("%s %s", getString(R.string.msg_error), error));
             binding.svNotification.setVisibility(View.VISIBLE);
-            binding.fabRefreshListMovie.setVisibility(View.VISIBLE);
-            binding.fabRefreshListMovie.setEnabled(true);
+            showFABRefresh();
             binding.srlListMovie.setVisibility(View.GONE);
         } else {
             binding.svNotification.setVisibility(View.GONE);
@@ -195,46 +214,19 @@ public class MovieListFragment extends Fragment {
     }
 
     private void initUI(View viewContext) {
+        setHasOptionsMenu(true);
         //fab
         binding.fabRefreshListMovie.setOnClickListener(view -> {
             binding.fabRefreshListMovie.setEnabled(false);
             mViewModel.getMovieListApi();
         });
 
-        //filter
-        binding.svFilter.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                movieRecyclerAdapter.filter(newText);
-                if (newText.length() == 0) {
-                    //original
-                    //se activa la carga temporal por scroll
-                    isEnabledFilter = false;
-                    Log.d(TAG, "onQueryTextChange: onBackpress" + MainActivity.isOnBackPress());
-                    if (!MainActivity.isOnBackPress())
-                        setMovieListAllMoviesPopularity();
-                    else
-                        MainActivity.setOnBackPress(false);
-                    return false;
-                }
-                //se desactiva la carga temporal por scroll
-                isEnabledFilter = true;
-                setMovieListFilter(newText.toLowerCase(), viewContext);
-                return false;
-            }
-        });
-
         //swipepullrefresh
-/*        binding.srlListMovie.setOnRefreshListener(() -> {
+        binding.srlListMovie.setOnRefreshListener(() -> {
             //termina el proceso false
             binding.srlListMovie.setRefreshing(false);
-            mViewModel.getMovieListApi();
-        });*/
+            //mViewModel.getMovieListApi();
+        });
 
         //recyclerview
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
@@ -288,14 +280,42 @@ public class MovieListFragment extends Fragment {
         binding.srvLoading.setItemViewType((type, position) -> R.layout.fragment_movie_list_item);
     }
 
+    private boolean filterMovieList(String newText) {
+        movieRecyclerAdapter.filter(newText);
+        Log.d(TAG, "filterMovieList: onBackpress ");
+        if (newText.length() == 0) {
+            //original
+            //se activa la carga temporal por scroll
+            isEnabledFilter = false;
+            Log.d(TAG, "onQueryTextChange: onBackpress" + MainActivity.isOnBackPress());
+            if (!MainActivity.isOnBackPress() && getView() != null)
+                setMovieListAllMoviesPopularity();
+            else
+                MainActivity.setOnBackPress(false);
+            return false;
+        }
+        //se desactiva la carga temporal por scroll
+        isEnabledFilter = true;
+        setMovieListFilter(newText.toLowerCase(), viewContext);
+        return false;
+    }
+
     private void setMovieListFilter(String newText, View viewContext) {
+        isLoadingObserver(true);
         new Thread(() -> {
             List<Movie> moviesDB = MainActivity.getMovieDatabase().movieDao().getListMovieTitle(newText);
             if (moviesDB.size() > 0) {
                 Log.d(TAG, "onQueryTextChange: movie DATOS " + moviesDB.size());
-                viewContext.post(() -> setMovieListFilter(moviesDB));
+                viewContext.post(() -> {
+                        isLoadingObserver(false);
+                        setMovieListFilter(moviesDB);
+            });
             } else {
-                Log.d(TAG, "onQueryTextChange: movie SIN RESULTADOS !!");
+                viewContext.post(() -> {
+                    isLoadingObserver(false);
+                    isEmptyMovieListFilter(true);
+                    Log.d(TAG, "onQueryTextChange: movie SIN RESULTADOS !!");
+                });
             }
         }).start();
     }
@@ -305,6 +325,7 @@ public class MovieListFragment extends Fragment {
             Log.d(TAG, "onMovieListener: selected movie title:: "
                     + movieList.get(binding.rvMovieList
                     .getChildAdapterPosition(view)).getMovieTitle());
+            isMovieSelected = true;
             Movie movieSelected = movieList.get(binding.rvMovieList.getChildAdapterPosition(view));
             MovieListFragmentDirections
                     .ActionMovieListFragmentToDetailMovieFragment action
@@ -319,6 +340,47 @@ public class MovieListFragment extends Fragment {
             Log.d(TAG, "onMovieListener: selectedMovieTitle:: " + movieList.get(position).getMovieTitle());
         }
     }*/
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main, menu);
+        movieListMenu = menu;
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Log.d(TAG, "onMenuItemActionCollapse " + item.getItemId());
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                Log.d(TAG, "onMenuItemActionExpand " + item.getItemId());
+                return true;
+            }
+        });
+
+        searchView.setOnCloseListener(() -> {
+            Log.d(TAG, "close:: ");
+            return false;
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(TAG, "onQueryTextChange: " + newText);
+                filterMovieList(newText);
+                return false;
+            }
+        });
+    }
 
     @Override
     public void onDestroyView() {

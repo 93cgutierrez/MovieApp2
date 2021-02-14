@@ -11,4 +11,5 @@
     <string name="msg_empty">The list is empty</string>
     <string name="msg_trailer_not_available">Trailer not available</string>
     <string name="content_movie_poster">movie poster</string>
+    <string name="msg_filter">Filter</string>
 </resources>

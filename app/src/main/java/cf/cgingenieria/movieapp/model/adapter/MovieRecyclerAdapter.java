@@ -1,5 +1,6 @@
 package cf.cgingenieria.movieapp.model.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cf.cgingenieria.movieapp.R;
-import cf.cgingenieria.movieapp.model.data.response.Movie;
+import cf.cgingenieria.movieapp.model.data.Movie;
 import cf.cgingenieria.movieapp.utils.Parameters;
 
 
@@ -26,7 +27,7 @@ import cf.cgingenieria.movieapp.utils.Parameters;
  * Created by CGIngenieria on 11/02/2021.
  */
 public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdapter.ViewHolderMovie> {
-    private List<Movie> movieList = new ArrayList<Movie>();
+    private List<Movie> movieList;
     private Context context;
     private OnMovieListener onMovieListener;
 
@@ -40,7 +41,7 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     @NotNull
     @Override
     public ViewHolderMovie onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        @SuppressLint("InflateParams") View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_movie_list_item, null, false);
         return new ViewHolderMovie(view, onMovieListener);
     }

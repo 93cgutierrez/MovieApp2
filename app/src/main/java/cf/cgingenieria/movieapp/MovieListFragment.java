@@ -1,8 +1,7 @@
 package cf.cgingenieria.movieapp;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +14,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.todkars.shimmer.ShimmerRecyclerView;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,16 +25,16 @@ import java.util.List;
 
 import cf.cgingenieria.movieapp.databinding.FragmentMovieListBinding;
 import cf.cgingenieria.movieapp.model.adapter.MovieRecyclerAdapter;
-import cf.cgingenieria.movieapp.model.data.response.Movie;
+import cf.cgingenieria.movieapp.model.data.Movie;
+import cf.cgingenieria.movieapp.utils.SharedPreferencesHelper;
 import cf.cgingenieria.movieapp.viewmodel.MovieListViewModel;
-import retrofit2.http.Body;
 
 public class MovieListFragment extends Fragment {
     private static final String TAG = MovieListFragment.class.getCanonicalName();
     private FragmentMovieListBinding binding;
     private MovieListViewModel mViewModel;
     private View viewContext;
-    private List<Movie> movieList = new ArrayList<Movie>();
+    private List<Movie> movieList = new ArrayList<>();
     private MovieRecyclerAdapter movieRecyclerAdapter;
     private boolean isScrolling = false;
     private GridLayoutManager gridLayoutManager;
@@ -45,7 +43,7 @@ public class MovieListFragment extends Fragment {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
+            @NotNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
 
@@ -66,7 +64,17 @@ public class MovieListFragment extends Fragment {
         if (viewContext != null) {
             initUI(viewContext);
             if (MainActivity.isFirstLaunch()) {
-                mViewModel.getMovieListApi();
+                if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) > 0) {
+                    new Thread(() -> {
+                        List<Movie> moviesDB = MainActivity.getMovieDatabase().movieDao().getAllMoviesPopularity();
+                        if (moviesDB.size() > 0) {
+                            if (!movieList.isEmpty())
+                                movieList.clear();
+                            viewContext.post(() -> getMovieList(moviesDB));
+                        }
+                    }).start();
+                } else
+                    mViewModel.getMovieListApi();
                 MainActivity.setIsFirstLaunch(false);
             }
             subscribeEvents(mViewModel);
@@ -84,10 +92,10 @@ public class MovieListFragment extends Fragment {
 
     private void getMovieList(List<Movie> movies) {
         Log.d(TAG, "getMovieList: movie: " + movieList.containsAll(movies));
-        if(!movieList.containsAll(movies)){
+        if (!movieList.containsAll(movies)) {
             // borrar la lista antigua
             if (movieList == null)
-                movieList = new ArrayList<Movie>();
+                movieList = new ArrayList<>();
 /*        if (movieList.size() > 0)
             movieList.clear();*/
 
@@ -114,6 +122,7 @@ public class MovieListFragment extends Fragment {
             binding.ivNotification.setImageResource(R.drawable.empty_icon);
             binding.tvNotification.setText(R.string.msg_empty);
             binding.fabRefreshListMovie.setVisibility(View.VISIBLE);
+            binding.fabRefreshListMovie.setEnabled(true);
             binding.srlListMovie.setVisibility(View.GONE);
         }
         binding.svNotification.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
@@ -125,9 +134,11 @@ public class MovieListFragment extends Fragment {
             binding.tvNotification.setText(String.format("%s %s", getString(R.string.msg_error), error));
             binding.svNotification.setVisibility(View.VISIBLE);
             binding.fabRefreshListMovie.setVisibility(View.VISIBLE);
+            binding.fabRefreshListMovie.setEnabled(true);
             binding.srlListMovie.setVisibility(View.GONE);
         } else {
             binding.svNotification.setVisibility(View.GONE);
+            binding.fabRefreshListMovie.setEnabled(false);
         }
     }
 
@@ -194,16 +205,18 @@ public class MovieListFragment extends Fragment {
                 int scrolledOutItems = gridLayoutManager.findFirstVisibleItemPosition();
                 if (isScrolling && (visibleItemCount + scrolledOutItems == totalItemCount)
                         && (visibleItemCount + scrolledOutItems != previousTotalCount)) {
-                    if (mViewModel.getCurrentPageVM() < mViewModel.getTotalAvailablePagesVM()) {
+                    Log.d(TAG, "onScrolled: movie current: "  + SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) + " total: " + SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 0));
+                    if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) < 4) {
+                           // < SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 2) - 497) {
                         previousTotalCount = totalItemCount;
                         isScrolling = false;
-                        mViewModel.setCurrentPageVM(mViewModel.getCurrentPageVM() + 1);
-                        mViewModel.getMovieListApi(mViewModel.getCurrentPageVM());
+                        SharedPreferencesHelper.setPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE,
+                                SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) + 1);
+                        mViewModel.getMovieListApi(SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0));
                     }
                 }
             }
         });
-        ;
 
         //loading
         binding.srvLoading.setLayoutManager(new GridLayoutManager(getActivity(), 3));

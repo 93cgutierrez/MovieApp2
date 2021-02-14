@@ -1,6 +1,5 @@
 package cf.cgingenieria.movieapp.viewmodel;
 
-import android.os.Handler;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -8,10 +7,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.List;
 
-import cf.cgingenieria.movieapp.model.data.response.Movie;
+import cf.cgingenieria.movieapp.MainActivity;
+import cf.cgingenieria.movieapp.model.data.Movie;
 import cf.cgingenieria.movieapp.model.repository.MovieRepositoryImpl;
+import cf.cgingenieria.movieapp.utils.SharedPreferencesHelper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -20,31 +23,16 @@ public class MovieListViewModel extends ViewModel {
     private static final String TAG = MovieListViewModel.class.getCanonicalName();
     private MovieRepositoryImpl movieRepository = new MovieRepositoryImpl();
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private int currentPageVM = 1;
-    private int totalAvailablePagesVM = 2;
-
-    public int getCurrentPageVM() {
-        return currentPageVM;
-    }
-
-    public void setCurrentPageVM(int currentPageVM) {
-        this.currentPageVM = currentPageVM;
-    }
-
-    public int getTotalAvailablePagesVM() {
-        return totalAvailablePagesVM;
-    }
-
-    public void setTotalAvailablePagesVM(int totalAvailablePagesVM) {
-        this.totalAvailablePagesVM = totalAvailablePagesVM;
-    }
+    //private int currentPageVM = 1;
+    //private int totalAvailablePagesVM = 2;
+    private int resultPages = 20;
 
     //loading
     private MutableLiveData<Boolean> isViewLoading = new MutableLiveData<>();
 
     public LiveData<Boolean> isViewLoading() {
         if (isViewLoading == null) {
-            isViewLoading = new MutableLiveData<Boolean>();
+            isViewLoading = new MutableLiveData<>();
         }
         return isViewLoading;
     }
@@ -54,7 +42,7 @@ public class MovieListViewModel extends ViewModel {
 
     public LiveData<Boolean> isViewLoadingMoreMovies() {
         if (isViewLoadingMoreMovies == null) {
-            isViewLoadingMoreMovies = new MutableLiveData<Boolean>();
+            isViewLoadingMoreMovies = new MutableLiveData<>();
         }
         return isViewLoadingMoreMovies;
     }
@@ -64,7 +52,7 @@ public class MovieListViewModel extends ViewModel {
 
     public LiveData<List<Movie>> getMovieList() {
         if (movieList == null) {
-            movieList = new MutableLiveData<List<Movie>>();
+            movieList = new MutableLiveData<>();
         }
         return movieList;
     }
@@ -74,7 +62,7 @@ public class MovieListViewModel extends ViewModel {
 
     public LiveData<Boolean> isEmptyMovieList() {
         if (isEmptyMovieList == null) {
-            isEmptyMovieList = new MutableLiveData<Boolean>();
+            isEmptyMovieList = new MutableLiveData<>();
         }
         return isEmptyMovieList;
     }
@@ -84,17 +72,16 @@ public class MovieListViewModel extends ViewModel {
 
     public LiveData<String> getOnMessageError() {
         if (onMessageError == null) {
-            onMessageError = new MutableLiveData<String>();
+            onMessageError = new MutableLiveData<>();
         }
         return onMessageError;
     }
 
     public void getMovieListApi() {
-        getMovieListApi(1);
+        getMovieListApi(Math.max(SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE,0), 1));
     }
 
     public void getMovieListApi(int currentPage) {
-        currentPageVM = currentPage;
         changeViewLoading(true);
         disposables.add(
                 movieRepository.getMovieList(currentPage)
@@ -103,10 +90,9 @@ public class MovieListViewModel extends ViewModel {
                         .subscribe(
                                 result -> {
                                     changeViewLoading(false);
-                                    if (result.code() == 200 && result.body() != null && result.body().getProductList() != null && result.body().getProductList().size() > 0) {
-                                        currentPageVM = result.body().getCurrentPageMovieList();
-                                        totalAvailablePagesVM = result.body().getTotalPagesMovieList();
-                                        movieList.postValue(result.body().getProductList());
+                                    if (result.code() == 200 && result.body() != null && result.body().getMovieList() != null && result.body().getMovieList().size() > 0) {
+                                        SharedPreferencesHelper.setPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, result.body().getTotalPagesMovieList());
+                                        saveMoviesDB(result.body().getMovieList(),result.body().getCurrentPageMovieList());
                                     } else {
                                         isEmptyMovieList.postValue(true);
                                     }
@@ -120,11 +106,35 @@ public class MovieListViewModel extends ViewModel {
     }
 
     private void changeViewLoading(boolean isLoading) {
-        if (currentPageVM == 1) {
+        if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE,0) == 1) {
             isViewLoading.postValue(isLoading);
         } else {
             isViewLoadingMoreMovies.postValue(isLoading);
         }
+    }
+
+    private void saveMoviesDB(List<Movie> movieList, int currentPage) {
+        new Thread(() -> {
+            //insert
+            List<Long> idList = MainActivity.getMovieDatabase()
+                    .movieDao()
+                    .createdMovie(movieList);
+            Log.d(TAG, "onClick: movieListCreated ids:: " + idList.size());
+            SharedPreferencesHelper.setPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, currentPage);
+            getMoviesDB();
+        }).start();
+    }
+
+    private void getMoviesDB() {
+        int offset = 0;
+        if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) > 1)
+            offset = (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) * resultPages) - resultPages;
+        //getAll
+        List<Movie> movieListDB = MainActivity.getMovieDatabase().movieDao()
+                .getListMoviesPopularityRange(offset);
+        //.getAllMoviesPopularity();
+        Log.d(TAG, "onActivityCreated: movie listSize: " + movieListDB.size());
+        movieList.postValue(movieListDB);
     }
 
     @Override

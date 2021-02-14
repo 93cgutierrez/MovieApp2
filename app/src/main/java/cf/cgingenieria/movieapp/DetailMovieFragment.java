@@ -14,8 +14,10 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 
+import org.jetbrains.annotations.NotNull;
+
 import cf.cgingenieria.movieapp.databinding.FragmentDetailMovieBinding;
-import cf.cgingenieria.movieapp.model.data.response.Movie;
+import cf.cgingenieria.movieapp.model.data.Movie;
 import cf.cgingenieria.movieapp.utils.Parameters;
 import cf.cgingenieria.movieapp.utils.UIHelper;
 
@@ -27,7 +29,7 @@ public class DetailMovieFragment extends Fragment {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
+            @NotNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
 
@@ -66,11 +68,9 @@ public class DetailMovieFragment extends Fragment {
         setImage(viewContext, Parameters.API_SERVER_BASE_URL_POSTER + movieReceived.getMovieBackdropPath(), binding.ivMoviePosterDetail);
         binding.tvMovieOverview.setText(movieReceived.getMovieOverview());
         binding.tvMovieReleaseDate.setText(movieReceived.getMovieReleaseDate());
-        binding.fabMovieTrailer.setOnClickListener(view -> {
-            Toast.makeText(getContext(),
-                    R.string.msg_trailer_not_available,
-                    Toast.LENGTH_SHORT).show();
-        });
+        binding.fabMovieTrailer.setOnClickListener(view -> Toast.makeText(getContext(),
+                R.string.msg_trailer_not_available,
+                Toast.LENGTH_SHORT).show());
     }
 
     private void setImage(View viewContext, String url, ImageView imageView) {

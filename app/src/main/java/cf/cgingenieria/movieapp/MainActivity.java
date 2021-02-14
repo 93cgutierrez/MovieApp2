@@ -1,5 +1,6 @@
 package cf.cgingenieria.movieapp;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -13,17 +14,34 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.room.Room;
 
 import cf.cgingenieria.movieapp.databinding.ActivityMainBinding;
+import cf.cgingenieria.movieapp.io.MovieDatabase;
+import cf.cgingenieria.movieapp.utils.SharedPreferencesHelper;
 
 import android.view.Menu;
 import android.view.MenuItem;
+
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getCanonicalName();
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private static boolean isFirstLaunch = false;
+    private static MovieDatabase movieDatabase;
+
+    public static MovieDatabase getMovieDatabase() {
+        return movieDatabase;
+    }
+
+    public static void setMovieDatabase(Context context) {
+        MainActivity.movieDatabase = Room.databaseBuilder(
+                context,
+                MovieDatabase.class, "movie-database")
+                .build();
+    }
 
     public static void setIsFirstLaunch(boolean isFirstLaunch) {
         MainActivity.isFirstLaunch = isFirstLaunch;
@@ -44,7 +62,14 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        setMovieDatabase(this);
+        SharedPreferencesHelper.SharedPreferencesHelperInit(this);
 
+        new Thread(() -> {
+            if(getMovieDatabase().movieDao().getAllMovies().size() > 0 && SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) == 0) {
+                SharedPreferencesHelper.setPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 1);
+            }
+        }).start();
     }
 
     @Override

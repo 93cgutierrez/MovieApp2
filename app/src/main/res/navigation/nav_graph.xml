@@ -23,6 +23,6 @@
             app:destination="@id/movieListFragment" />
         <argument
             android:name="movieSelected"
-            app:argType="cf.cgingenieria.movieapp.model.data.response.Movie" />
+            app:argType="cf.cgingenieria.movieapp.model.data.Movie" />
     </fragment>
 </navigation>

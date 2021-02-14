@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import cf.cgingenieria.movieapp.model.data.Movie;
 
 
 /**
@@ -16,7 +16,7 @@ import java.util.List;
 public class MovieListResponse implements Serializable {
     @SerializedName("results")
     @Expose
-    private List<Movie> productList = new ArrayList<Movie>();
+    private List<Movie> movieList = new ArrayList<>();
     @SerializedName("page")
     @Expose
     private int currentPageMovieList;
@@ -27,12 +27,12 @@ public class MovieListResponse implements Serializable {
     @Expose
     private int totalResultsMovieList;
 
-    public List<Movie> getProductList() {
-        return productList;
+    public List<Movie> getMovieList() {
+        return movieList;
     }
 
-    public void setProductList(List<Movie> productList) {
-        this.productList = productList;
+    public void setMovieList(List<Movie> movieList) {
+        this.movieList = movieList;
     }
 
     public int getCurrentPageMovieList() {

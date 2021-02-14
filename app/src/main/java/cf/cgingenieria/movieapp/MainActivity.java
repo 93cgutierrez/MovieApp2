@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private static boolean isFirstLaunch = false;
+    private static boolean onBackPress = false;
     private static MovieDatabase movieDatabase;
 
     public static MovieDatabase getMovieDatabase() {
@@ -49,6 +50,14 @@ public class MainActivity extends AppCompatActivity {
 
     public static boolean isFirstLaunch() {
         return isFirstLaunch;
+    }
+
+    public static boolean isOnBackPress() {
+        return onBackPress;
+    }
+
+    public static void setOnBackPress(boolean onBackPress) {
+        MainActivity.onBackPress = onBackPress;
     }
 
     @Override

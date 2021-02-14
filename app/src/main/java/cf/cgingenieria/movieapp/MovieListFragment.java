@@ -10,6 +10,7 @@ import android.widget.AbsListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -39,6 +40,7 @@ public class MovieListFragment extends Fragment {
     private boolean isScrolling = false;
     private GridLayoutManager gridLayoutManager;
     private int previousTotalCount = 0;
+    private boolean isEnabledFilter = false;
 
 
     @Override
@@ -65,20 +67,24 @@ public class MovieListFragment extends Fragment {
             initUI(viewContext);
             if (MainActivity.isFirstLaunch()) {
                 if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) > 0) {
-                    new Thread(() -> {
-                        List<Movie> moviesDB = MainActivity.getMovieDatabase().movieDao().getAllMoviesPopularity();
-                        if (moviesDB.size() > 0) {
-                            if (!movieList.isEmpty())
-                                movieList.clear();
-                            viewContext.post(() -> getMovieList(moviesDB));
-                        }
-                    }).start();
+                    setMovieListAllMoviesPopularity();
                 } else
                     mViewModel.getMovieListApi();
                 MainActivity.setIsFirstLaunch(false);
             }
             subscribeEvents(mViewModel);
         }
+    }
+
+    private void setMovieListAllMoviesPopularity() {
+        new Thread(() -> {
+            List<Movie> moviesDB = MainActivity.getMovieDatabase().movieDao().getAllMoviesPopularity();
+            if (moviesDB.size() > 0) {
+                if (!movieList.isEmpty())
+                    movieList.clear();
+                viewContext.post(() -> getMovieList(moviesDB));
+            }
+        }).start();
     }
 
 
@@ -107,6 +113,28 @@ public class MovieListFragment extends Fragment {
             //añaden no borra anteriores
             movieRecyclerAdapter.notifyItemRangeInserted(oldSizeMovieList, movies.size());
         }
+        //se muestra la lista
+        binding.rvMovieList.setVisibility(View.VISIBLE);
+        //se oculta lo demas
+        isLoadingObserver(false);
+        isEmptyMovieList(false);
+        getOnMessageErrorObserver(null);
+        binding.fabRefreshListMovie.setVisibility(View.GONE);
+        binding.srlListMovie.setVisibility(View.VISIBLE);
+    }
+
+    private void setMovieListFilter(List<Movie> movies) {
+        // borrar la lista antigua
+        if (movieList == null)
+            movieList = new ArrayList<>();
+        if (movieList.size() > 0)
+            movieList.clear();
+
+        // agregar nueva lista
+        movieList.addAll(movies);
+        //notificar al adaptador
+        movieRecyclerAdapter.notifyDataSetChanged();
+
         //se muestra la lista
         binding.rvMovieList.setVisibility(View.VISIBLE);
         //se oculta lo demas
@@ -173,12 +201,40 @@ public class MovieListFragment extends Fragment {
             mViewModel.getMovieListApi();
         });
 
+        //filter
+        binding.svFilter.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                movieRecyclerAdapter.filter(newText);
+                if (newText.length() == 0) {
+                    //original
+                    //se activa la carga temporal por scroll
+                    isEnabledFilter = false;
+                    Log.d(TAG, "onQueryTextChange: onBackpress" + MainActivity.isOnBackPress());
+                    if (!MainActivity.isOnBackPress())
+                        setMovieListAllMoviesPopularity();
+                    else
+                        MainActivity.setOnBackPress(false);
+                    return false;
+                }
+                //se desactiva la carga temporal por scroll
+                isEnabledFilter = true;
+                setMovieListFilter(newText.toLowerCase(), viewContext);
+                return false;
+            }
+        });
+
         //swipepullrefresh
-        binding.srlListMovie.setOnRefreshListener(() -> {
+/*        binding.srlListMovie.setOnRefreshListener(() -> {
             //termina el proceso false
             binding.srlListMovie.setRefreshing(false);
             mViewModel.getMovieListApi();
-        });
+        });*/
 
         //recyclerview
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
@@ -203,11 +259,12 @@ public class MovieListFragment extends Fragment {
                 int visibleItemCount = gridLayoutManager.getChildCount();
                 int totalItemCount = gridLayoutManager.getItemCount();
                 int scrolledOutItems = gridLayoutManager.findFirstVisibleItemPosition();
+                Log.d(TAG, "onQueryTextChange: movie filter: " + isEnabledFilter);
                 if (isScrolling && (visibleItemCount + scrolledOutItems == totalItemCount)
-                        && (visibleItemCount + scrolledOutItems != previousTotalCount)) {
-                    Log.d(TAG, "onScrolled: movie current: "  + SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) + " total: " + SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 0));
+                        && (visibleItemCount + scrolledOutItems != previousTotalCount) && !isEnabledFilter) {
+                    Log.d(TAG, "onScrolled: movie current: " + SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) + " total: " + SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 0));
                     if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) < 4) {
-                           // < SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 2) - 497) {
+                        // < SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 2) - 497) {
                         previousTotalCount = totalItemCount;
                         isScrolling = false;
                         SharedPreferencesHelper.setPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE,
@@ -231,9 +288,21 @@ public class MovieListFragment extends Fragment {
         binding.srvLoading.setItemViewType((type, position) -> R.layout.fragment_movie_list_item);
     }
 
+    private void setMovieListFilter(String newText, View viewContext) {
+        new Thread(() -> {
+            List<Movie> moviesDB = MainActivity.getMovieDatabase().movieDao().getListMovieTitle(newText);
+            if (moviesDB.size() > 0) {
+                Log.d(TAG, "onQueryTextChange: movie DATOS " + moviesDB.size());
+                viewContext.post(() -> setMovieListFilter(moviesDB));
+            } else {
+                Log.d(TAG, "onQueryTextChange: movie SIN RESULTADOS !!");
+            }
+        }).start();
+    }
+
     private void onMovieListener(View view) {
         if (view != null) {
-            Log.d(TAG, "onMovieListener: tedMovieTitle:: "
+            Log.d(TAG, "onMovieListener: selected movie title:: "
                     + movieList.get(binding.rvMovieList
                     .getChildAdapterPosition(view)).getMovieTitle());
             Movie movieSelected = movieList.get(binding.rvMovieList.getChildAdapterPosition(view));

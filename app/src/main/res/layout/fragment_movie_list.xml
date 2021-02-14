@@ -9,7 +9,7 @@
     <!--Loading-->
     <com.todkars.shimmer.ShimmerRecyclerView
         android:id="@+id/srv_loading"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -74,17 +74,18 @@
         android:id="@+id/srl_list_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginTop="56dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/sv_filter"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_movie_list"
             android:name="cf.cgingenieria.appmovies.MovieListFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="3"
             tools:context=".view.MovieListFragment"
@@ -92,6 +93,17 @@
             tools:listitem="@layout/fragment_movie_list_item" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/sv_filter"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        app:iconifiedByDefault="true"
+        app:queryHint="Filter"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/srl_list_movie" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/cpi_loading_more_movies"

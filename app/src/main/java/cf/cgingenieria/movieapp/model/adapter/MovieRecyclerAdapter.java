@@ -2,6 +2,7 @@ package cf.cgingenieria.movieapp.model.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import cf.cgingenieria.movieapp.R;
 import cf.cgingenieria.movieapp.model.data.Movie;
@@ -28,6 +30,7 @@ import cf.cgingenieria.movieapp.utils.Parameters;
  */
 public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdapter.ViewHolderMovie> {
     private List<Movie> movieList;
+    private List<Movie> originList;
     private Context context;
     private OnMovieListener onMovieListener;
 
@@ -35,6 +38,8 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         this.movieList = movieList;
         this.context = context;
         this.onMovieListener = onMovieListener;
+        this.originList = new ArrayList<>();
+        originList.addAll(movieList);
     }
 
     @NonNull
@@ -56,8 +61,31 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         return movieList.size();
     }
 
+    public void filter(String filter) {
+        if (filter.length() == 0) {
+            movieList.clear();
+            movieList.addAll(originList);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                List<Movie> movieListFilter = originList.stream().filter(movie -> movie.getMovieTitle()
+                        .toLowerCase().contains(filter))
+                        .collect(Collectors.toList());
+                movieList.clear();
+                movieList.addAll(movieListFilter);
+            } else {
+                movieList.clear();
+                for (Movie movie : originList) {
+                    if (movie.getMovieTitle().toLowerCase().contains(filter)) {
+                        movieList.add(movie);
+                    }
+                }
+            }
+        }
+        notifyDataSetChanged();
+    }
+
     public static class ViewHolderMovie extends RecyclerView.ViewHolder
-    implements View.OnClickListener {
+            implements View.OnClickListener {
         OnMovieListener onMovieListener;
         private ImageView iv_movie_poster;
         private TextView tv_movie_title;
@@ -73,11 +101,11 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         public void setDataMovie(Context context, Movie movie) {
             tv_movie_title.setText(movie.getMovieTitle());
             //GLIDE set image
-            try{
+            try {
                 Glide.with(context).load(Parameters.API_SERVER_BASE_URL_POSTER + movie.getMoviePosterPath())
                         .centerInside()
                         .into(iv_movie_poster);
-            } catch (Exception e){
+            } catch (Exception e) {
                 Glide.with(context).load(R.drawable.ic_launcher_foreground)
                         .into(iv_movie_poster);
             }
@@ -91,7 +119,7 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         }
     }
 
-    public interface OnMovieListener{
+    public interface OnMovieListener {
         void onMovieListener(View view);
     }
 }

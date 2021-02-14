@@ -88,6 +88,9 @@ public class DetailMovieFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        MainActivity.setOnBackPress(true);
     }
+
+
 
 }

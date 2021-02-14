@@ -36,6 +36,10 @@ public interface MovieDao {
     //getByTitle filter %:movieTitle%
     @Query("SELECT * FROM Movie WHERE movie_title LIKE '%' || :movieTitle || '%'")
     Movie getMovieByTitle(String movieTitle);
+
+    //getByTitle filter %:movieTitle%
+    @Query("SELECT * FROM Movie WHERE movie_title LIKE '%' || :movieTitle || '%'")
+    List<Movie> getListMovieTitle(String movieTitle);
     
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     long createdMovie(Movie movie);

@@ -1,6 +1,7 @@
 package cf.cgingenieria.movieapp.viewmodel;
 
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -101,15 +102,14 @@ public class MovieListViewModel extends ViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 result -> {
-                                    new Handler().postDelayed(() -> {
-                                        changeViewLoading(false);
-                                        if (result.code() == 200 && result.body() != null && result.body().getProductList() != null && result.body().getProductList().size() > 0) {
-                                            totalAvailablePagesVM = result.body().getTotalPagesMovieList();
-                                            movieList.postValue(result.body().getProductList());
-                                        } else {
-                                            isEmptyMovieList.postValue(true);
-                                        }
-                                    }, 5000);
+                                    changeViewLoading(false);
+                                    if (result.code() == 200 && result.body() != null && result.body().getProductList() != null && result.body().getProductList().size() > 0) {
+                                        currentPageVM = result.body().getCurrentPageMovieList();
+                                        totalAvailablePagesVM = result.body().getTotalPagesMovieList();
+                                        movieList.postValue(result.body().getProductList());
+                                    } else {
+                                        isEmptyMovieList.postValue(true);
+                                    }
                                 },
                                 throwable -> {
                                     changeViewLoading(false);

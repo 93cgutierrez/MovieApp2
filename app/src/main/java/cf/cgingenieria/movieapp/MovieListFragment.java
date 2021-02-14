@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,6 +38,9 @@ public class MovieListFragment extends Fragment {
     private View viewContext;
     private List<Movie> movieList = new ArrayList<Movie>();
     private MovieRecyclerAdapter movieRecyclerAdapter;
+    private boolean isScrolling = false;
+    private GridLayoutManager gridLayoutManager;
+    private int previousTotalCount = 0;
 
 
     @Override
@@ -79,19 +83,22 @@ public class MovieListFragment extends Fragment {
     }
 
     private void getMovieList(List<Movie> movies) {
-        // borrar la lista antigua
-        if (movieList == null)
-            movieList = new ArrayList<Movie>();
+        Log.d(TAG, "getMovieList: movie: " + movieList.containsAll(movies));
+        if(!movieList.containsAll(movies)){
+            // borrar la lista antigua
+            if (movieList == null)
+                movieList = new ArrayList<Movie>();
 /*        if (movieList.size() > 0)
             movieList.clear();*/
 
-        int oldSizeMovieList = movieList.size();
-        // agregar nueva lista
-        movieList.addAll(movies);
+            int oldSizeMovieList = movieList.size();
+            // agregar nueva lista
+            movieList.addAll(movies);
 /*        // notificar al adaptador
         movieRecyclerAdapter.notifyDataSetChanged();*/
-        //añaden no borra anteriores
-        movieRecyclerAdapter.notifyItemRangeInserted(oldSizeMovieList, movies.size());
+            //añaden no borra anteriores
+            movieRecyclerAdapter.notifyItemRangeInserted(oldSizeMovieList, movies.size());
+        }
         //se muestra la lista
         binding.rvMovieList.setVisibility(View.VISIBLE);
         //se oculta lo demas
@@ -163,8 +170,9 @@ public class MovieListFragment extends Fragment {
         });
 
         //recyclerview
+        gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         binding.rvMovieList.setHasFixedSize(true);
-        binding.rvMovieList.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        binding.rvMovieList.setLayoutManager(gridLayoutManager);
                /* new LinearLayoutManager(getContext(),
                         LinearLayoutManager.VERTICAL, false));*/
         movieRecyclerAdapter = new MovieRecyclerAdapter(movieList, getContext(), this::onMovieListener);
@@ -172,18 +180,30 @@ public class MovieListFragment extends Fragment {
         //detectar scroll
         binding.rvMovieList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
+            public void onScrollStateChanged(@NonNull @NotNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
+                    isScrolling = true;
+            }
+
+            @Override
             public void onScrolled(@NonNull @NotNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                Log.d(TAG, "movie onScrolled: ");
-                if(binding.rvMovieList.canScrollVertically(1)) {
-                    Log.d(TAG, "movie onScrolled: " + mViewModel.getCurrentPageVM() + " - " + mViewModel.getTotalAvailablePagesVM());
-                    if(mViewModel.getCurrentPageVM() <= mViewModel.getTotalAvailablePagesVM()){
+                int visibleItemCount = gridLayoutManager.getChildCount();
+                int totalItemCount = gridLayoutManager.getItemCount();
+                int scrolledOutItems = gridLayoutManager.findFirstVisibleItemPosition();
+                if (isScrolling && (visibleItemCount + scrolledOutItems == totalItemCount)
+                        && (visibleItemCount + scrolledOutItems != previousTotalCount)) {
+                    if (mViewModel.getCurrentPageVM() < mViewModel.getTotalAvailablePagesVM()) {
+                        previousTotalCount = totalItemCount;
+                        isScrolling = false;
                         mViewModel.setCurrentPageVM(mViewModel.getCurrentPageVM() + 1);
                         mViewModel.getMovieListApi(mViewModel.getCurrentPageVM());
                     }
                 }
             }
         });
+        ;
 
         //loading
         binding.srvLoading.setLayoutManager(new GridLayoutManager(getActivity(), 3));

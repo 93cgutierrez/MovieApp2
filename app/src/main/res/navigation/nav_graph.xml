@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/movieListFragment">
+    <fragment
+        android:id="@+id/movieListFragment"
+        android:name="cf.cgingenieria.movieapp.view.MovieListFragment"
+        android:label="@string/fragment_movie_list_title"
+        tools:layout="@layout/fragment_movie_list">
+        <action
+            android:id="@+id/action_movieListFragment_to_detailMovieFragment"
+            app:destination="@id/detailMovieFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailMovieFragment"
+        android:name="cf.cgingenieria.movieapp.view.DetailMovieFragment"
+        android:label="@string/fragment_detail_movie_title"
+        tools:layout="@layout/fragment_detail_movie">
+        <action
+            android:id="@+id/action_detailMovieFragment_to_movieListFragment"
+            app:destination="@id/movieListFragment" />
+        <argument
+            android:name="movieSelected"
+            app:argType="cf.cgingenieria.movieapp.model.data.Movie" />
+    </fragment>
+</navigation>

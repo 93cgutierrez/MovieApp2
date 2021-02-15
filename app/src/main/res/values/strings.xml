@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">MovieApp</string>
+    <string name="action_settings">Settings</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="fragment_movie_list_title">Movies</string>
+    <string name="fragment_detail_movie_title">Detail movie</string>
+    <string name="fab_refresh_list_movie_content">Refresh list</string>
+    <string name="icon_content">Icon</string>
+    <string name="msg_error">An error has occurred: </string>
+    <string name="msg_empty">The list is empty</string>
+    <string name="msg_trailer_not_available">Trailer not available</string>
+    <string name="content_movie_poster">movie poster</string>
+    <string name="msg_filter">Filter</string>
+    <string name="content_movie_poster_detail">movie poster</string>
+    <string name="content_fab_play_trailer">play to movie trailer</string>
+    <string name="msg_title_summery_movie">Sumary</string>
+    <string name="dummy_movie_overview">Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto.</string>
+    <string name="msg_title_release_movie">Release date</string>
+    <string name="dummy_release_date_movie">2020-12-16</string>
+</resources>

@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferencesHelper.setPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 1);
             }
         }).start();
-        Log.d("TAG", "onCreate: API: " + BuildConfig.API_KEY);
     }
 
     @Override

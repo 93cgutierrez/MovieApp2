@@ -114,7 +114,6 @@ public class MovieListViewModel extends ViewModel {
             List<Long> idList = MainActivity.getMovieDatabase()
                     .movieDao()
                     .createdMovie(movieList);
-            Log.d(TAG, "onClick: movieListCreated ids:: " + idList.size());
             SharedPreferencesHelper.setPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, currentPage);
             getMoviesDB();
         }).start();
@@ -131,7 +130,6 @@ public class MovieListViewModel extends ViewModel {
         List<Movie> movieListDB = MainActivity.getMovieDatabase().movieDao()
                 .getListMoviesPopularityRange(offset);
         //.getAllMoviesPopularity();
-        Log.d(TAG, "onActivityCreated: movie listSize: " + movieListDB.size());
         movieList.postValue(movieListDB);
     }
 

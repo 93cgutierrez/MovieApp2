@@ -48,7 +48,6 @@ public class DetailMovieFragment extends Fragment {
                     && DetailMovieFragmentArgs.fromBundle(getArguments()).getMovieSelected().getMovieOverview() != null
                     && DetailMovieFragmentArgs.fromBundle(getArguments()).getMovieSelected().getMoviePosterPath() != null) {
                 movieReceived = DetailMovieFragmentArgs.fromBundle(getArguments()).getMovieSelected();
-                Log.d(TAG, "onViewCreated: Movie: " + movieReceived.getMovieTitle());
             }
             viewContext = view;
         }

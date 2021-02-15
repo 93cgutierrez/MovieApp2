@@ -102,7 +102,6 @@ public class MovieListFragment extends Fragment {
     }
 
     private void getMovieList(List<Movie> movies) {
-        Log.d(TAG, "getMovieList: movie: " + movieList.containsAll(movies));
         if (!movieList.containsAll(movies)) {
             // borrar la lista antigua
             if (movieList == null)
@@ -247,11 +246,9 @@ public class MovieListFragment extends Fragment {
                 int visibleItemCount = gridLayoutManager.getChildCount();
                 int totalItemCount = gridLayoutManager.getItemCount();
                 int scrolledOutItems = gridLayoutManager.findFirstVisibleItemPosition();
-                Log.d(TAG, "onQueryTextChange: movie filter: " + isEnabledFilter);
                 if (isScrolling && (visibleItemCount + scrolledOutItems == totalItemCount)
                         && (visibleItemCount + scrolledOutItems != previousTotalCount) && !isEnabledFilter) {
-                    Log.d(TAG, "onScrolled: movie current: " + SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) + " total: " + SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 0));
-                    if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) < 4) {
+                    if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) < SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 2)) {
                         // < SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_TOTAL_PAGES, 2) - 497) {
                         previousTotalCount = totalItemCount;
                         isScrolling = false;
@@ -265,8 +262,6 @@ public class MovieListFragment extends Fragment {
 
         //loading
         binding.srvLoading.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-               /* new LinearLayoutManager(getContext(),
-                        LinearLayoutManager.VERTICAL, false));*/
         binding.srvLoading.setAdapter(movieRecyclerAdapter);
         /* Shimmer layout view type depending on List / Gird */
 
@@ -278,12 +273,10 @@ public class MovieListFragment extends Fragment {
 
     private void filterMovieList(String newText) {
         movieRecyclerAdapter.filter(newText);
-        Log.d(TAG, "filterMovieList: onBackpress ");
         if (newText.length() == 0) {
             //original
             //se activa la carga temporal por scroll
             isEnabledFilter = false;
-            Log.d(TAG, "onQueryTextChange: onBackpress" + MainActivity.isOnBackPress());
             if (!MainActivity.isOnBackPress() && getView() != null)
                 setMovieListAllMoviesPopularity();
             else
@@ -300,7 +293,6 @@ public class MovieListFragment extends Fragment {
         new Thread(() -> {
             List<Movie> moviesDB = MainActivity.getMovieDatabase().movieDao().getListMovieTitle(newText);
             if (moviesDB.size() > 0) {
-                Log.d(TAG, "onQueryTextChange: movie DATOS " + moviesDB.size());
                 viewContext.post(() -> {
                         isLoadingObserver(false);
                         setMovieListFilter(moviesDB);
@@ -309,7 +301,6 @@ public class MovieListFragment extends Fragment {
                 viewContext.post(() -> {
                     isLoadingObserver(false);
                     isEmptyMovieListFilter();
-                    Log.d(TAG, "onQueryTextChange: movie SIN RESULTADOS !!");
                 });
             }
         }).start();
@@ -317,9 +308,6 @@ public class MovieListFragment extends Fragment {
 
     private void onMovieListener(View view) {
         if (view != null) {
-            Log.d(TAG, "onMovieListener: selected movie title:: "
-                    + movieList.get(binding.rvMovieList
-                    .getChildAdapterPosition(view)).getMovieTitle());
             Movie movieSelected = movieList.get(binding.rvMovieList.getChildAdapterPosition(view));
             MovieListFragmentDirections
                     .ActionMovieListFragmentToDetailMovieFragment action
@@ -328,12 +316,6 @@ public class MovieListFragment extends Fragment {
                     .navigate(action);
         }
     }
-
-/*    private void onMovieListener(int position) {
-        if(movieList != null && movieList.get(position) != null){
-            Log.d(TAG, "onMovieListener: selectedMovieTitle:: " + movieList.get(position).getMovieTitle());
-        }
-    }*/
 
     @Override
     public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
@@ -345,19 +327,16 @@ public class MovieListFragment extends Fragment {
         searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                Log.d(TAG, "onMenuItemActionCollapse " + item.getItemId());
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                Log.d(TAG, "onMenuItemActionExpand " + item.getItemId());
                 return true;
             }
         });
 
         searchView.setOnCloseListener(() -> {
-            Log.d(TAG, "close:: ");
             return false;
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -368,7 +347,6 @@ public class MovieListFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.d(TAG, "onQueryTextChange: " + newText);
                 filterMovieList(newText);
                 return false;
             }

@@ -16,7 +16,6 @@ public class UIHelper {
     private static final String TAG = UIHelper.class.getCanonicalName();
 
     public static void hideToolbar(FragmentActivity activity, boolean hide, String title) {
-        Log.d(TAG, "hideToolbar: " + hide);
         if (activity != null && ((AppCompatActivity) activity).getSupportActionBar() != null) {
             if (hide) {
                 Objects.requireNonNull(((AppCompatActivity) activity).getSupportActionBar()).hide();

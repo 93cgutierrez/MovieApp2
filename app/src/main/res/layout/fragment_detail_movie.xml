@@ -24,7 +24,7 @@
             android:layout_height="@dimen/fragment_detai_iv_movie_posterl_height"
             android:contentDescription="@string/content_movie_poster_detail"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background"
+            android:src="@mipmap/ic_launcher_foreground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

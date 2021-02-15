@@ -29,10 +29,10 @@ import cf.cgingenieria.movieapp.utils.Parameters;
  * Created by CGIngenieria on 11/02/2021.
  */
 public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdapter.ViewHolderMovie> {
-    private List<Movie> movieList;
-    private List<Movie> originList;
-    private Context context;
-    private OnMovieListener onMovieListener;
+    private final List<Movie> movieList;
+    private final List<Movie> originList;
+    private final Context context;
+    private final OnMovieListener onMovieListener;
 
     public MovieRecyclerAdapter(List<Movie> movieList, Context context, OnMovieListener onMovieListener) {
         this.movieList = movieList;
@@ -87,8 +87,8 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     public static class ViewHolderMovie extends RecyclerView.ViewHolder
             implements View.OnClickListener {
         OnMovieListener onMovieListener;
-        private ImageView iv_movie_poster;
-        private TextView tv_movie_title;
+        private final ImageView iv_movie_poster;
+        private final TextView tv_movie_title;
 
         public ViewHolderMovie(@NonNull @NotNull View itemView, OnMovieListener onMovieListener) {
             super(itemView);

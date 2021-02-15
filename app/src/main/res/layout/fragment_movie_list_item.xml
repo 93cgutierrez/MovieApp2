@@ -7,9 +7,9 @@
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_margin="2dp"
-        app:cardBackgroundColor="#B8B8B8">
+        android:layout_height="@dimen/card_height"
+        android:layout_margin="@dimen/card_margin"
+        app:cardBackgroundColor="@color/background_card">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -20,7 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="#A7A6A6"
+                android:background="@color/background_image_card"
                 android:contentDescription="@string/content_movie_poster" />
 
 
@@ -34,11 +34,11 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
-                android:padding="2dp"
+                android:padding="@dimen/tv_movie_title_padding"
                 android:textAlignment="center"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:background="#A3040404"
-                android:textColor="@color/white"
+                android:background="@color/backgroung_text_item"
+                android:textColor="@color/content"
                 android:gravity="center_horizontal" />
 
 

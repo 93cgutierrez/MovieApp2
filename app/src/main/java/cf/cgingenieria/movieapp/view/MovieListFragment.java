@@ -1,7 +1,6 @@
-package cf.cgingenieria.movieapp;
+package cf.cgingenieria.movieapp.view;
 
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,13 +19,12 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cf.cgingenieria.movieapp.R;
 import cf.cgingenieria.movieapp.databinding.FragmentMovieListBinding;
 import cf.cgingenieria.movieapp.model.adapter.MovieRecyclerAdapter;
 import cf.cgingenieria.movieapp.model.data.Movie;
@@ -44,8 +42,6 @@ public class MovieListFragment extends Fragment {
     private GridLayoutManager gridLayoutManager;
     private int previousTotalCount = 0;
     private boolean isEnabledFilter = false;
-    private Menu movieListMenu;
-    private boolean isMovieSelected = false;
 
 
     @Override
@@ -69,7 +65,7 @@ public class MovieListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(MovieListViewModel.class);
         if (viewContext != null) {
-            initUI(viewContext);
+            initUI();
             if (MainActivity.isFirstLaunch()) {
                 if (SharedPreferencesHelper.getPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 0) > 0) {
                     setMovieListAllMoviesPopularity();
@@ -167,8 +163,8 @@ public class MovieListFragment extends Fragment {
     }
 
 
-    private void isEmptyMovieListFilter(Boolean isEmpty) {
-        showEmptyMessage(isEmpty);
+    private void isEmptyMovieListFilter() {
+        showEmptyMessage(true);
     }
 
     private void showFABRefresh() {
@@ -213,7 +209,7 @@ public class MovieListFragment extends Fragment {
         binding.srlListMovie.setRefreshing(isLoading);
     }
 
-    private void initUI(View viewContext) {
+    private void initUI() {
         setHasOptionsMenu(true);
         //fab
         binding.fabRefreshListMovie.setOnClickListener(view -> {
@@ -280,7 +276,7 @@ public class MovieListFragment extends Fragment {
         binding.srvLoading.setItemViewType((type, position) -> R.layout.fragment_movie_list_item);
     }
 
-    private boolean filterMovieList(String newText) {
+    private void filterMovieList(String newText) {
         movieRecyclerAdapter.filter(newText);
         Log.d(TAG, "filterMovieList: onBackpress ");
         if (newText.length() == 0) {
@@ -292,12 +288,11 @@ public class MovieListFragment extends Fragment {
                 setMovieListAllMoviesPopularity();
             else
                 MainActivity.setOnBackPress(false);
-            return false;
+            return;
         }
         //se desactiva la carga temporal por scroll
         isEnabledFilter = true;
         setMovieListFilter(newText.toLowerCase(), viewContext);
-        return false;
     }
 
     private void setMovieListFilter(String newText, View viewContext) {
@@ -313,7 +308,7 @@ public class MovieListFragment extends Fragment {
             } else {
                 viewContext.post(() -> {
                     isLoadingObserver(false);
-                    isEmptyMovieListFilter(true);
+                    isEmptyMovieListFilter();
                     Log.d(TAG, "onQueryTextChange: movie SIN RESULTADOS !!");
                 });
             }
@@ -325,7 +320,6 @@ public class MovieListFragment extends Fragment {
             Log.d(TAG, "onMovieListener: selected movie title:: "
                     + movieList.get(binding.rvMovieList
                     .getChildAdapterPosition(view)).getMovieTitle());
-            isMovieSelected = true;
             Movie movieSelected = movieList.get(binding.rvMovieList.getChildAdapterPosition(view));
             MovieListFragmentDirections
                     .ActionMovieListFragmentToDetailMovieFragment action
@@ -345,7 +339,6 @@ public class MovieListFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_main, menu);
-        movieListMenu = menu;
         MenuItem searchItem = menu.findItem(R.id.action_search);
 
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();

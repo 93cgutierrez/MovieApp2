@@ -1,3 +1,26 @@
 <resources>
+    <dimen name="fragment_host_width_margin">0dp</dimen>
+    <dimen name="fragment_host_height_margin">0dp</dimen>
+    <dimen name="fragment_detai_iv_movie_posterl_height">250dp</dimen>
+    <dimen name="fragment_detai_iv_movie_poster_margin_top">222dp</dimen>
+    <dimen name="fragment_detai_iv_movie_poster_margin_horizontal">16dp</dimen>
+    <dimen name="fragment_detail_title_summary_margin">40dp</dimen>
+    <dimen name="tv_movie_content_margin">40dp</dimen>
+    <dimen name="tv_movie_detail_margin_vertical">8dp</dimen>
+    <dimen name="tv_movie_detail_margin_title">40dp</dimen>
+    <dimen name="tv_movie_content_detail_release_date_margin">40dp</dimen>
+    <dimen name="tv_movie_content_detail_margin_top">8dp</dimen>
+    <dimen name="tv_movie_content_detail_margin_bottom">16dp</dimen>
+    <dimen name="tv_movie_content_movie_list">20sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="iv_notification_height">150dp</dimen>
+    <dimen name="iv_novtification_margin_horizontal">32dp</dimen>
+    <dimen name="tv_notification_margin_vertical">16dp</dimen>
+    <dimen name="cpi_loading_more_movies_margin">8dp</dimen>
+    <dimen name="card_height">200dp</dimen>
+    <dimen name="card_margin">2dp</dimen>
+    <dimen name="tv_movie_title_padding">2dp</dimen>
+
+    <dimen name="tv_movie_title_detail">24sp</dimen>
+    <dimen name="tv_movie_content_detail">18sp</dimen>
 </resources>

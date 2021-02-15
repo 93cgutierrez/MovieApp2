@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MovieListFragment">
+    android:background="@color/primary"
+    tools:context=".view.MovieListFragment">
 
     <!--Loading-->
     <com.todkars.shimmer.ShimmerRecyclerView
@@ -46,8 +47,8 @@
             <ImageView
                 android:id="@+id/iv_notification"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_marginHorizontal="32dp"
+                android:layout_height="@dimen/iv_notification_height"
+                android:layout_marginHorizontal="@dimen/iv_novtification_margin_horizontal"
                 android:contentDescription="@string/icon_content"
                 android:src="@drawable/error_icon"/>
 
@@ -55,11 +56,11 @@
                 android:id="@+id/tv_notification"
                 android:layout_height="wrap_content"
                 android:text="@string/msg_error"
-                android:textColor="@color/black"
+                android:textColor="@color/subtitle"
                 android:gravity="center"
                 android:textStyle="normal"
-                android:textSize="25sp"
-                android:layout_marginVertical="16dp"
+                android:textSize="@dimen/tv_movie_content_movie_list"
+                android:layout_marginVertical="@dimen/tv_notification_margin_vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/iv_notification"
@@ -99,9 +100,9 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:visibility="gone"
-        android:layout_margin="8dp"
-        android:background="#ADFFFFFF"
-        app:indicatorColor="@color/black"
+        android:layout_margin="@dimen/cpi_loading_more_movies_margin"
+        android:background="@color/accent"
+        app:indicatorColor="@color/primary"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -112,16 +113,16 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom|right"
-    android:layout_marginEnd="16dp"
-    android:layout_marginRight="16dp"
-    android:layout_marginBottom="16dp"
+    android:layout_marginEnd="@dimen/fab_margin"
+    android:layout_marginRight="@dimen/fab_margin"
+    android:layout_marginBottom="@dimen/fab_margin"
     android:visibility="gone"
     android:enabled="false"
     android:contentDescription="@string/fab_refresh_list_movie_content"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:srcCompat="@drawable/refresh_icon"
-    app:backgroundTint="#80FB54"
+    app:backgroundTint="@color/accent"
     tools:ignore="RtlHardcoded" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

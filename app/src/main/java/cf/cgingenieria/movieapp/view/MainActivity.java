@@ -1,14 +1,9 @@
-package cf.cgingenieria.movieapp;
+package cf.cgingenieria.movieapp.view;
 
 import android.content.Context;
 import android.os.Bundle;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.util.Log;
-import android.view.View;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -16,19 +11,18 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.room.Room;
 
+import cf.cgingenieria.movieapp.BuildConfig;
+import cf.cgingenieria.movieapp.R;
 import cf.cgingenieria.movieapp.databinding.ActivityMainBinding;
 import cf.cgingenieria.movieapp.io.MovieDatabase;
 import cf.cgingenieria.movieapp.utils.SharedPreferencesHelper;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import static java.security.AccessController.getContext;
-
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getCanonicalName();
     private AppBarConfiguration appBarConfiguration;
-    private ActivityMainBinding binding;
     private static boolean isFirstLaunch = false;
     private static boolean onBackPress = false;
     private static MovieDatabase movieDatabase;
@@ -64,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        cf.cgingenieria.movieapp.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
         isFirstLaunch = true;
@@ -79,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferencesHelper.setPrefInt(SharedPreferencesHelper.KEY_CURRENT_PAGE, 1);
             }
         }).start();
+        Log.d("TAG", "onCreate: API: " + BuildConfig.API_KEY);
     }
 
     @Override

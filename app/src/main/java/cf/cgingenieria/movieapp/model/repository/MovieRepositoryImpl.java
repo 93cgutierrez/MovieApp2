@@ -1,7 +1,7 @@
 package cf.cgingenieria.movieapp.model.repository;
 
 
-import cf.cgingenieria.movieapp.io.MovieApiAdapter;
+import cf.cgingenieria.movieapp.model.adapter.MovieApiAdapter;
 import cf.cgingenieria.movieapp.model.data.response.MovieDetailsResponse;
 import cf.cgingenieria.movieapp.model.data.response.MovieListResponse;
 import io.reactivex.Observable;

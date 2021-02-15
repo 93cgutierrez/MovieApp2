@@ -1,7 +1,9 @@
 package cf.cgingenieria.movieapp.io;
+
 import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
+import cf.cgingenieria.movieapp.BuildConfig;
 import cf.cgingenieria.movieapp.utils.Parameters;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -18,7 +20,7 @@ public class ServiceInterceptor implements Interceptor {
         Request.Builder newRequest = chain.request().newBuilder();
         HttpUrl originalHttpUrl = chain.request().url();
         HttpUrl newHttpUrl = originalHttpUrl.newBuilder()
-                .addQueryParameter("api_key", Parameters.API_KEY)
+                .addQueryParameter("api_key", BuildConfig.API_KEY)
                 .build();
         newRequest.url(newHttpUrl);
     return chain.proceed(newRequest.build());

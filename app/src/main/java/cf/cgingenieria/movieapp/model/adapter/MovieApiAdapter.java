@@ -1,6 +1,8 @@
-package cf.cgingenieria.movieapp.io;
+package cf.cgingenieria.movieapp.model.adapter;
 
 
+import cf.cgingenieria.movieapp.io.MovieApiService;
+import cf.cgingenieria.movieapp.io.ServiceInterceptor;
 import cf.cgingenieria.movieapp.utils.Parameters;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;

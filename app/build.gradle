@@ -1,8 +1,9 @@
 plugins {
     id 'com.android.application'
 }
-
 apply plugin: "androidx.navigation.safeargs"
+
+def API_KEY = '"' + API_KEY + '"' ?: '"NoAPIKEY"'
 
 android {
     compileSdkVersion 30
@@ -16,6 +17,13 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        each { type ->
+            type.resValue 'string', 'API_KEY', API_KEY
+            type.buildConfigField 'String', 'API_KEY', API_KEY
+        }
+        manifestPlaceholders = [
+                API_KEY : API_KEY
+        ]
     }
 
     buildTypes {

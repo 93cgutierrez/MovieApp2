@@ -55,8 +55,7 @@ public interface MovieDao {
     @Delete
     int deleteMovie(Movie movie);
 
-
-    //TODO: REMOVER DE PRODUCCION
+    //tener mucho cuidado solo para pruebas
     @Query("DELETE FROM Movie")
     void clearDBMovie();
 }

@@ -1,4 +1,4 @@
-package cf.cgingenieria.movieapp;
+package cf.cgingenieria.movieapp.view;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 
 import org.jetbrains.annotations.NotNull;
 
+import cf.cgingenieria.movieapp.R;
 import cf.cgingenieria.movieapp.databinding.FragmentDetailMovieBinding;
 import cf.cgingenieria.movieapp.model.data.Movie;
 import cf.cgingenieria.movieapp.utils.Parameters;

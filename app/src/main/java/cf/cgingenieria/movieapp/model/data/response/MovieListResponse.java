@@ -16,43 +16,33 @@ import cf.cgingenieria.movieapp.model.data.Movie;
 public class MovieListResponse implements Serializable {
     @SerializedName("results")
     @Expose
-    private List<Movie> movieList = new ArrayList<>();
+    private final List<Movie> movieList = new ArrayList<>();
     @SerializedName("page")
     @Expose
-    private int currentPageMovieList;
+    private final int currentPageMovieList;
     @SerializedName("total_pages")
     @Expose
-    private int totalPagesMovieList;
+    private final int totalPagesMovieList;
     @SerializedName("total_results")
     @Expose
     private int totalResultsMovieList;
 
-    public List<Movie> getMovieList() {
-        return movieList;
+    public MovieListResponse(int currentPageMovieList, int totalPagesMovieList, int totalResultsMovieList) {
+        this.currentPageMovieList = currentPageMovieList;
+        this.totalPagesMovieList = totalPagesMovieList;
+        this.totalResultsMovieList = totalResultsMovieList;
     }
 
-    public void setMovieList(List<Movie> movieList) {
-        this.movieList = movieList;
+    public List<Movie> getMovieList() {
+        return movieList;
     }
 
     public int getCurrentPageMovieList() {
         return currentPageMovieList;
     }
 
-    public void setCurrentPageMovieList(int currentPageMovieList) {
-        this.currentPageMovieList = currentPageMovieList;
-    }
-
     public int getTotalPagesMovieList() {
         return totalPagesMovieList;
-    }
-
-    public void setTotalPagesMovieList(int totalPagesMovieList) {
-        this.totalPagesMovieList = totalPagesMovieList;
-    }
-
-    public int getTotalResultsMovieList() {
-        return totalResultsMovieList;
     }
 
     public void setTotalResultsMovieList(int totalResultsMovieList) {

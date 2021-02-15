@@ -6,7 +6,7 @@
     app:startDestination="@id/movieListFragment">
     <fragment
         android:id="@+id/movieListFragment"
-        android:name="cf.cgingenieria.movieapp.MovieListFragment"
+        android:name="cf.cgingenieria.movieapp.view.MovieListFragment"
         android:label="@string/fragment_movie_list_title"
         tools:layout="@layout/fragment_movie_list">
         <action
@@ -15,7 +15,7 @@
     </fragment>
     <fragment
         android:id="@+id/detailMovieFragment"
-        android:name="cf.cgingenieria.movieapp.DetailMovieFragment"
+        android:name="cf.cgingenieria.movieapp.view.DetailMovieFragment"
         android:label="@string/fragment_detail_movie_title"
         tools:layout="@layout/fragment_detail_movie">
         <action
